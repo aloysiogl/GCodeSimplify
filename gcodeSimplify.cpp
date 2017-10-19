@@ -119,19 +119,6 @@ int main(){
 
         gCodeEdit.close();
     }
-    //Moving the done parts to a dedicate directory
-    CreateDirectory(".\\done",NULL);
-
-    //Moving each file
-    for (int i = 0; i < gCodeNames.size(); ++i){
-        string moveCommand;
-
-        moveCommand+= "move ";
-        moveCommand+= gCodeNames[i];
-        moveCommand+= " .\\done";
-
-        system(moveCommand.c_str());
-    }
 
     //Final message after generating the codes
     cout << "All files processed with "<< nErr << " errors!\n\n";
@@ -191,10 +178,49 @@ int main(){
             system(command.c_str());
 
         }
+
+        //Moving the done parts to a dedicate directory
+        CreateDirectory(".\\sent",NULL);
+
+        //Moving each file
+
+        cout << "Moving original files to .\\done directory...\n\n";
+
+        for (int i = 0; i < gCodeNames.size(); ++i){
+            string moveCommand;
+
+            moveCommand+= "move ";
+            moveCommand+= gCodeNames[i];
+            moveCommand+= " .\\sent";
+
+            cout << gCodeNames[i] << " ";
+            system(moveCommand.c_str());
+        }
+
+        cout << "\n";
     }
 
     //Do nothing
     else {
+        //Moving the done parts to a dedicate directory
+        CreateDirectory(".\\done",NULL);
+
+        //Moving each file
+
+        cout << "Moving original files to .\\done directory...\n\n";
+
+        for (int i = 0; i < gCodeNames.size(); ++i){
+            string moveCommand;
+
+            moveCommand+= "move ";
+            moveCommand+= gCodeNames[i];
+            moveCommand+= " .\\done";
+
+            cout << gCodeNames[i] << " ";
+            system(moveCommand.c_str());
+        }
+
+        cout << "\n";
     }
     //End of the program
     system("pause");
