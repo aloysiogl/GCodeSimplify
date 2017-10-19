@@ -191,8 +191,9 @@ int main(){
         CreateDirectory(".\\sent",NULL);
 
         //Moving each file
+        system("cls");
 
-        cout << "Moving original files to .\\done directory...\n\n";
+        cout << "Moving original files to .\\sent directory...\n\n";
 
         for (int i = 0; i < gCodeNames.size(); ++i){
             string moveCommand;
@@ -315,7 +316,7 @@ string correctionFunction(string line, int &err){
     //Removing H
     case 5:
         if (line.find("H") != string::npos){
-            line = line.substr(0,line.size()-2)+'\n';
+            line = line.substr(0,line.size()-3)+'\n';
             correct = true;
         }
     break;
