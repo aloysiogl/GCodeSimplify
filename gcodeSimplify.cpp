@@ -5,6 +5,8 @@
 #include <cstring>
 #include <cstdio>
 #include <fstream>
+#include <iomanip>
+#include <algorithm>
 
 #define N_ERR 7
 
@@ -81,9 +83,15 @@ int main(){
     //Creating vector of output names
     vector<string> gCodeOutNames;
 
+    //Store the maximum size
+    int maxSize = 0;
+
     for (int i = 0; i < gCodeNames.size(); ++i){
         string outName = ".\\out" + gCodeNames[i].substr(1,string::npos);
         gCodeOutNames.push_back(outName);
+
+        if (gCodeNames[i].size() > maxSize)
+            maxSize = gCodeNames[i].size();
     }
 
     //Creating output directory
@@ -113,7 +121,7 @@ int main(){
         }
 
         else {
-            cout << "Generated "<< gCodeOutNames[i] << N_ERR+1 - errorIndex <<" modifications couldn't be done.\n";
+            cout << "Generated "<< setw(maxSize+4) << gCodeOutNames[i] << " " << N_ERR+1 - errorIndex <<" modifications couldn't be done.\n";
             nErr++;
         }
 
@@ -121,7 +129,7 @@ int main(){
     }
 
     //Final message after generating the codes
-    cout << "All files processed with "<< nErr << " errors!\n\n";
+    cout << "\nAll files processed with "<< nErr << " errors!\n\n";
 
 
     //Prompt user to send files to Sherline
@@ -193,7 +201,7 @@ int main(){
             moveCommand+= gCodeNames[i];
             moveCommand+= " .\\sent";
 
-            cout << gCodeNames[i] << " ";
+            cout << setw(maxSize) << gCodeNames[i] << " ";
             system(moveCommand.c_str());
         }
 
@@ -216,7 +224,7 @@ int main(){
             moveCommand+= gCodeNames[i];
             moveCommand+= " .\\done";
 
-            cout << gCodeNames[i] << " ";
+            cout << setw(maxSize) << gCodeNames[i] << " ";
             system(moveCommand.c_str());
         }
 
