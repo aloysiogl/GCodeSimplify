@@ -1,0 +1,7 @@
+//SHERLINE INFO
+IP:192.168.0.20
+DIRECTORY:/home/sherline/Documents/SMALL
+
+//PATH TO PUTTY
+PATH:\Program Files\PuTTY
+

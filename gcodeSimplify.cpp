@@ -102,6 +102,34 @@ string correctionFunction(string line, int &err){
 }
 
 int main(){
+    //Opening the configurations file
+    ifstream config(".//config.txt");
+
+    //Configurations
+    string path;
+    string sherlineIp;
+    string destinationDirectory;
+
+    //Getting configurations from file
+    string line;
+    getline(config,line);
+    getline(config,line);
+    sherlineIp = line.substr(3,string::npos);
+    getline(config,line);
+    destinationDirectory = line.substr(10,string::npos);
+
+    //Adding path
+    getline(config,line);
+    getline(config,line);
+    getline(config,line);
+    path = line.substr(5,string::npos);
+
+    string setPath;
+    setPath+= "set PATH=C:";
+    setPath+= path;
+    setPath+= ";%PATH%";
+    system(setPath.c_str());
+
     //Getting all the file names within the current directory
     vector<string> files;
 
@@ -138,8 +166,7 @@ int main(){
     //Do the file correction to each gCode in the vector
     for (int i = 0; i < gCodeNames.size(); ++i){
         ifstream gCodeOriginal(gCodeNames[i].c_str());
-        ofstream gCodeEdit;
-        gCodeEdit.open(gCodeOutNames[i].c_str());
+        ofstream gCodeEdit(gCodeOutNames[i].c_str());
 
         string line;
 
@@ -163,9 +190,73 @@ int main(){
 
         gCodeEdit.close();
     }
+    //Moving the done parts to a dedicate directory
+    CreateDirectory(".\\done",NULL);
 
-    cout << "All files processed with "<< nErr << " errors!\n";
+    //Moving each file
+    for (int i = 0; i < gCodeNames.size(); ++i){
+        string moveCommand;
 
+        moveCommand+= "move ";
+        moveCommand+= gCodeNames[i];
+        moveCommand+= " .\\done";
+
+        system(moveCommand.c_str());
+    }
+
+    //Final message after generating the codes
+    cout << "All files processed with "<< nErr << " errors!\n\n";
+
+
+    //Prompt user to send files to Sherline
+    cout << "Do you want to send the files to Sherline CNC now (Y/n)?\n";
+
+    char send;
+
+    cin >> send;
+
+    //Clearing the screen
+    system("cls");
+
+    //Start routine to send files
+    if (send == 'Y' || send == 'y'){
+        cout << "\nAccording to the config file the following IP and folder are going to be used:\n";
+        cout << "IP: " << sherlineIp << "\n";
+        cout << "Destination: " << destinationDirectory << "\n";
+
+        cout << "Do you want to change the destination (Y,n)?\n";
+
+        //comment
+        char change;
+
+        cin >> change;
+
+        if (change == 'Y' || change == 'y'){
+
+        }
+
+        else {
+
+        }
+
+        //Sending the codes
+        for (int i = 0; i < gCodeOutNames.size(); ++i){
+            string command;
+            command += "pscp -l sherline -pw sherline ";
+            command += gCodeOutNames[i];
+            command += " sherline@";
+            command += sherlineIp;
+            command += ":";
+            command += destinationDirectory;
+
+            system(command.c_str());
+
+        }
+    }
+
+    //Do nothing
+    else {
+    }
     //End of the program
     system("pause");
 }
