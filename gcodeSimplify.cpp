@@ -10,125 +10,54 @@
 
 using namespace std;
 
-// Folder must end with "/", e.g. "D:/images/"
-vector<string> get_all_files_full_path_within_folder(string folder)
-{
-    vector<string> names;
-    char search_path[200];
-    sprintf(search_path, "%s*.*", folder.c_str());
-    WIN32_FIND_DATA fd;
-    HANDLE hFind = ::FindFirstFile(search_path, &fd);
-    if(hFind != INVALID_HANDLE_VALUE)
-    {
-        do
-        {
-            // read all (real) files in current folder, delete '!' read other 2 default folder . and ..
-            if(! (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) )
-            {
-                names.push_back(folder+fd.cFileName);
-            }
-        }while(::FindNextFile(hFind, &fd));
-        ::FindClose(hFind);
-    }
-    return names;
-}
+//Check if a file exists
+bool is_file_exist(const char *fileName);
 
-//Correction function which suggests corrections
-string correctionFunction(string line, int &err){
-    bool correct = false;
-    switch (err){
-    //Removing Z0
-    case 0:
-        if (line.find("G53 G0 Z0.") != string::npos){
-            line = "";
-            correct = true;
-        }
-    break;
-    //Removing three lines
-    case 1:
-        if (line.find("M9") != string::npos){
-            line = "";
-            correct = true;
-        }
-    break;
-    case 2:
-        if (true){
-            line = "";
-            correct = true;
-        }
-    break;
-    case 3:
-        if (true){
-            line = "";
-            correct = true;
-        }
-    break;
-    //Adding Z20
-    case 4:
-        if (line.find("G54") != string::npos){
-            line = "G54\nG0 Z20.\n";
-            correct = true;
-        }
-    break;
-    //Removing H
-    case 5:
-        if (line.find("H") != string::npos){
-            line = line.substr(0,line.size()-2)+'\n';
-            correct = true;
-        }
-    break;
-    //Removing M9
-    case 6:
-        if (line.find("M9") != string::npos){
-            line = "";
-            correct = true;
-        }
-    break;
-    //Removing Z0
-    case 7:
-        if (line.find("G53 Z0.") != string::npos){
-            line = "";
-            correct = true;
-        }
-    }
+//Corrects the gCode
+string correctionFunction(string line, int &err);
 
-    if (!correct){
-        return line + '\n';
-    }
-    else {
-        err++;
-        return line;
-    }
-}
+//Gets files in a folder
+vector<string> get_all_files_full_path_within_folder(string folder);
+
+//Generate config file
+void generateConfig(string path, string sherlineIp, string destinationDirectory);
 
 int main(){
     //Opening the configurations file
     ifstream config(".//config.txt");
 
     //Configurations
-    string path;
-    string sherlineIp;
-    string destinationDirectory;
+    string path = "\\Program Files\\PuTTY";
+    string sherlineIp = "192.168.0.20";
+    string destinationDirectory = "/home/sherline/Documents/SMALL";
 
-    //Getting configurations from file
-    string line;
-    getline(config,line);
-    getline(config,line);
-    sherlineIp = line.substr(3,string::npos);
-    getline(config,line);
-    destinationDirectory = line.substr(10,string::npos);
+    //Getting configurations from file if config file exists
+    if (is_file_exist(".\\config.txt")){
 
-    //Adding path
-    getline(config,line);
-    getline(config,line);
-    getline(config,line);
-    path = line.substr(5,string::npos);
+        //Sherline info
+        string line;
+        getline(config,line);
+        getline(config,line);
+        sherlineIp = line.substr(3,string::npos);
+        getline(config,line);
+        destinationDirectory = line.substr(10,string::npos);
 
-    string setPath;
-    setPath+= "set PATH=C:";
-    setPath+= path;
-    setPath+= ";%PATH%";
-    system(setPath.c_str());
+        //Adding path
+        getline(config,line);
+        getline(config,line);
+        getline(config,line);
+        path = line.substr(5,string::npos);
+
+        string setPath;
+        setPath+= "set PATH=C:";
+        setPath+= path;
+        setPath+= ";%PATH%";
+        system(setPath.c_str());
+    }
+
+    else {
+        generateConfig(path, sherlineIp, destinationDirectory);
+    }
 
     //Getting all the file names within the current directory
     vector<string> files;
@@ -259,4 +188,113 @@ int main(){
     }
     //End of the program
     system("pause");
+}
+
+//Checking if file already exists
+bool is_file_exist(const char *fileName)
+{
+    std::ifstream infile(fileName);
+    return infile.good();
+}
+
+//Generate configuration file
+void generateConfig(string path, string sherlineIp, string destinationDirectory){
+    ofstream newConfig("config.txt");
+
+    newConfig << "//SHERLINE INFO\n";
+    newConfig << "IP:" << sherlineIp << "\n";
+    newConfig << "DIRECTORY:" << destinationDirectory << "\n\n";
+    newConfig << "//PATH TO PUTTY\n";
+    newConfig << "PATH:" << path << "\n";
+}
+
+// Folder must end with "/", e.g. "D:/images/"
+vector<string> get_all_files_full_path_within_folder(string folder)
+{
+    vector<string> names;
+    char search_path[200];
+    sprintf(search_path, "%s*.*", folder.c_str());
+    WIN32_FIND_DATA fd;
+    HANDLE hFind = ::FindFirstFile(search_path, &fd);
+    if(hFind != INVALID_HANDLE_VALUE)
+    {
+        do
+        {
+            // read all (real) files in current folder, delete '!' read other 2 default folder . and ..
+            if(! (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) )
+            {
+                names.push_back(folder+fd.cFileName);
+            }
+        }while(::FindNextFile(hFind, &fd));
+        ::FindClose(hFind);
+    }
+    return names;
+}
+
+//Correction function which indicates the corrections
+string correctionFunction(string line, int &err){
+    bool correct = false;
+    switch (err){
+    //Removing Z0
+    case 0:
+        if (line.find("G53 G0 Z0.") != string::npos){
+            line = "";
+            correct = true;
+        }
+    break;
+    //Removing three lines
+    case 1:
+        if (line.find("M9") != string::npos){
+            line = "";
+            correct = true;
+        }
+    break;
+    case 2:
+        if (true){
+            line = "";
+            correct = true;
+        }
+    break;
+    case 3:
+        if (true){
+            line = "";
+            correct = true;
+        }
+    break;
+    //Adding Z20
+    case 4:
+        if (line.find("G54") != string::npos){
+            line = "G54\nG0 Z20.\n";
+            correct = true;
+        }
+    break;
+    //Removing H
+    case 5:
+        if (line.find("H") != string::npos){
+            line = line.substr(0,line.size()-2)+'\n';
+            correct = true;
+        }
+    break;
+    //Removing M9
+    case 6:
+        if (line.find("M9") != string::npos){
+            line = "";
+            correct = true;
+        }
+    break;
+    //Removing Z0
+    case 7:
+        if (line.find("G53 Z0.") != string::npos){
+            line = "";
+            correct = true;
+        }
+    }
+
+    if (!correct){
+        return line + '\n';
+    }
+    else {
+        err++;
+        return line;
+    }
 }
