@@ -64,7 +64,7 @@ int main(){
 
     files = get_all_files_full_path_within_folder(".\\");
 
-    //Selecting only the gCode
+    //Selecting only the gCodes
     string keyString(".ngc");
 
     vector<string> gCodeNames;
@@ -138,7 +138,7 @@ int main(){
 
 
     //Prompt user to send files to Sherline
-    cout << "Do you want to send the files to Sherline CNC now (Y/n)?\n";
+    cout << "Do you want to send the files to Sherline CNC now (Y/n)?";
 
     char send;
 
@@ -149,24 +149,34 @@ int main(){
 
     //Start routine to send files
     if (send == 'Y' || send == 'y'){
-        cout << "\nAccording to the config file the following IP and folder are going to be used:\n";
+        cout << "According to the config file the following IP and folder are going to be used:\n";
         cout << "IP: " << sherlineIp << "\n";
         cout << "Destination: " << destinationDirectory << "\n";
 
-        cout << "Do you want to change the destination (Y,n)?\n";
+        cout << "Do you want to change the destination (Y,n)?";
 
         //comment
         char change;
 
         cin >> change;
 
+        //Generating new config file
         if (change == 'Y' || change == 'y'){
+            cout << "Type the new path to the archive:\n";
+            cin >> destinationDirectory;
+            generateConfig(path, sherlineIp, destinationDirectory);
 
+            system("cls");
+            cout << "The new settings are:\n";
+            cout << "IP: " << sherlineIp << "\n";
+            cout << "Destination: " << destinationDirectory << "\n";
         }
 
         else {
-
+            //Do nothing
         }
+
+        cout << "\n";
 
         //Sending the codes
         for (int i = 0; i < gCodeOutNames.size(); ++i){
