@@ -148,7 +148,7 @@ int main(){
         cout << "IP: " << sherlineIp << "\n";
         cout << "Destination: " << destinationDirectory << "\n";
 
-        cout << "Do you want to change the destination (Y,n)?";
+        cout << "\nDo you want to change the destination (Y,n)?";
 
         //comment
         char change;
@@ -156,22 +156,43 @@ int main(){
         cin >> change;
 
         //Generating new config file
-        if (change == 'Y' || change == 'y'){
-            cout << "Type the new path to the archive:\n";
+        if (change == 'Y' || change == 'y') {
+            //Printing the new path
+            cout << "\nType the new path to the archive:\n";
             cin >> destinationDirectory;
             generateConfig(path, sherlineIp, destinationDirectory);
 
             system("cls");
             cout << "The new settings are:\n";
             cout << "IP: " << sherlineIp << "\n";
-            cout << "Destination: " << destinationDirectory << "\n";
+            cout << "Destination: " << destinationDirectory << "\n\n";
+
+            //Trying to create directory
+
+            //Opening command file
+            ofstream createDirCommand("command.txt");
+
+            //Command do be sent
+            string createDir = "mkdir " + destinationDirectory;
+
+            createDirCommand << createDir;
+            createDirCommand.close();
+
+            //Opening connection and sending message
+            createDir = "plink -ssh ";
+            createDir += sherlineIp;
+            createDir += " -l sherline -pw sherline -m command.txt";
+            system(createDir.c_str());
+
+            system("DEL command.txt");
         }
 
         else {
-            //Do nothing
+            //Clearing screen
+            system("cls");
         }
 
-        cout << "\n";
+        cout << "Sending files, please wait:\n\n";
 
         //Sending the codes
         for (int i = 0; i < gCodeOutNames.size(); ++i){
@@ -187,11 +208,13 @@ int main(){
 
         }
 
+        //Jumping line
+        cout << "\n";
+
         //Moving the done parts to a dedicate directory
         CreateDirectory(".\\sent",NULL);
 
         //Moving each file
-        system("cls");
 
         cout << "Moving original files to .\\sent directory...\n\n";
 
@@ -329,8 +352,8 @@ string correctionFunction(string line, int &err){
     break;
     //Removing Z0
     case 7:
-        if (line.find("G53 Z0.") != string::npos){
-            line = "";
+        if (line.find("G53 Z0.") != string::npos || line.find("G53 G0 Z0.") != string::npos){
+            line = "G0 X0 Y0 Z60.\n";
             correct = true;
         }
     }
