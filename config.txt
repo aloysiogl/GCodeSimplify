@@ -1,6 +1,6 @@
 //SHERLINE INFO
 IP:192.168.0.20
-DIRECTORY:/home/sherline/Documents/SMALL/DribArmRighte
+DIRECTORY:testdata
 
 //PATH TO PUTTY
 PATH:\Program Files\PuTTY

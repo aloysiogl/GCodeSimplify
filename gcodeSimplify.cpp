@@ -7,6 +7,7 @@
 #include <fstream>
 #include <iomanip>
 #include <algorithm>
+#include <sstream>
 
 #define N_ERR 7
 
@@ -117,11 +118,11 @@ int main(){
         }
 
         if (errorIndex == N_ERR+1){
-            cout << "Generated "<< gCodeOutNames[i] << " ok!\n";
+            cout << "Generated "<< gCodeOutNames[i] << " ok!\n\n";
         }
 
         else {
-            cout << "Generated "<< setw(maxSize+4) << gCodeOutNames[i] << " " << N_ERR+1 - errorIndex <<" modifications couldn't be done.\n";
+            cout << "Generated "<< setw(maxSize+4) << gCodeOutNames[i] << " " << N_ERR+1 - errorIndex <<" modifications couldn't be done.\n\n";
             nErr++;
         }
 
@@ -129,21 +130,23 @@ int main(){
     }
 
     //Final message after generating the codes
-    cout << "\nAll files processed with "<< nErr << " errors!\n\n";
+    cout << "All files processed with "<< nErr << " errors!\n\n";
 
 
     //Prompt user to send files to Sherline
     cout << "Do you want to send the files to Sherline CNC now (Y/n)?";
 
-    char send;
+    cin.putback('n');
 
-    cin >> send;
+    string send;
+
+    getline(cin, send);
 
     //Clearing the screen
     system("cls");
 
     //Start routine to send files
-    if (send == 'Y' || send == 'y'){
+    if (send == "Y" || send == "y" || send.empty()){
         cout << "According to the config file the following IP and folder are going to be used:\n";
         cout << "IP: " << sherlineIp << "\n";
         cout << "Destination: " << destinationDirectory << "\n";
@@ -151,14 +154,18 @@ int main(){
         cout << "\nDo you want to change the destination (Y,n)?";
 
         //comment
-        char change;
+        string change;
 
-        cin >> change;
+        getline(cin, change);
 
         //Generating new config file
-        if (change == 'Y' || change == 'y') {
+        if (change == "Y" || change == "y") {
             //Printing the new path
             cout << "\nType the new path to the archive:\n";
+
+
+
+
             cin >> destinationDirectory;
             generateConfig(path, sherlineIp, destinationDirectory);
 
