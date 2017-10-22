@@ -1,6 +1,6 @@
 //SHERLINE INFO
 IP:192.168.0.20
-DIRECTORY:testdata
+DIRECTORY:rhthdhdfh
 
 //PATH TO PUTTY
 PATH:\Program Files\PuTTY
