@@ -27,6 +27,9 @@ vector<string> get_all_files_full_path_within_folder(string folder);
 void generateConfig(string path, string sherlineIp, string destinationDirectory);
 
 int main(){
+    //Clearing screen
+    system("cls");
+
     //Opening the configurations file
     ifstream config(".//config.txt");
 
