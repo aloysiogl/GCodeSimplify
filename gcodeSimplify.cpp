@@ -136,8 +136,6 @@ int main(){
     //Prompt user to send files to Sherline
     cout << "Do you want to send the files to Sherline CNC now (Y/n)?";
 
-    cin.putback('n');
-
     string send;
 
     getline(cin, send);
